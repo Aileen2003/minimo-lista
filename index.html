@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mínimo de una Lista | Python + Pytest + CI</title>
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --line: rgba(255,255,255,.14);
+      --shadow: 0 14px 45px rgba(0,0,0,.45);
+      --r: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 15% -10%, rgba(120, 156, 255, .35), transparent 65%),
+        radial-gradient(900px 600px at 90% 10%, rgba(98, 255, 198, .18), transparent 60%),
+        radial-gradient(700px 500px at 60% 105%, rgba(255, 140, 204, .16), transparent 60%),
+        linear-gradient(180deg, #070b17, #0b1020 45%, #070b17);
+      overflow-x: hidden;
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 230px;
+    }
+    .logo{
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.15) 55%),
+        linear-gradient(135deg, rgba(120,156,255,.8), rgba(98,255,198,.35));
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .brand strong{ font-size: 14px; letter-spacing: .2px; }
+    .brand span{ display:block; font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      user-select: none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.22);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(120,156,255,.85), rgba(98,255,198,.35));
+      border-color: rgba(255,255,255,.22);
+    }
+
+    /* Hero */
+    .hero{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-left{
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 12px;
+      width: fit-content;
+    }
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(28px, 3.6vw, 44px);
+      line-height: 1.1;
+      letter-spacing: -0.6px;
+    }
+    .subtitle{
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 60ch;
+    }
+
+    .hero-cta{
+      margin-top: 16px;
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .meta{
+      margin-top: 18px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge{
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sparkle{
+      position:absolute;
+      inset: -40px -40px auto auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle at 35% 35%, rgba(120,156,255,.35), transparent 65%);
+      filter: blur(8px);
+      opacity: .9;
+      pointer-events:none;
+      transform: rotate(20deg);
+    }
+
+    /* Side */
+    .hero-right{
+      padding: 18px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mini{
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,.85);
+      letter-spacing: .2px;
+    }
+    .mini p{
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Sections */
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .col-7{ grid-column: span 7; }
+    .col-5{ grid-column: span 5; }
+    .col-12{ grid-column: span 12; }
+
+    .section{
+      padding: 22px;
+    }
+
+    .section h2{
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: -0.2px;
+    }
+    .section p{
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .code{
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.22);
+      border-radius: 14px;
+      padding: 14px;
+      overflow:auto;
+    }
+    pre{
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(255,255,255,.88);
+    }
+    .k{ color: rgba(98,255,198,.9); }
+    .f{ color: rgba(120,156,255,.95); }
+    .s{ color: rgba(255,140,204,.95); }
+    .c{ color: rgba(255,255,255,.60); }
+
+    .list{
+      display:grid;
+      gap: 10px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .item{
+      display:flex;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      align-items:flex-start;
+    }
+    .dot{
+      width: 10px;
+      height: 10px;
+      margin-top: 4px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(120,156,255,.95), rgba(98,255,198,.6));
+      flex: 0 0 auto;
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding: 18px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tiny{
+      color: rgba(255,255,255,.55);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+      .col-7, .col-5{ grid-column: span 12; }
+      .topbar{ border-radius: 18px; }
+      .brand{ min-width: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <strong>Mínimo de una Lista</strong>
+          <span>Python · Pytest · GitHub Actions (CI)</span>
+        </div>
+      </div>
+
+      <nav class="actions">
+        <a class="btn" href="#uso">Cómo usar</a>
+        <a class="btn" href="#tests">Pruebas</a>
+        <a class="btn" href="#ci">CI</a>
+        <!-- Si quieres, reemplaza # por el link real de tu repo -->
+        <a class="btn primary" href="#" title="Pega aquí el link de tu repo en GitHub">Ver Repo</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="card hero-left">
+        <div class="sparkle" aria-hidden="true"></div>
+        <div class="pill">✅ Proyecto académico · DevOps demo</div>
+
+        <h1>Encuentra el valor mínimo en una lista<br/>con validación, pruebas y CI.</h1>
+        <p class="subtitle">
+          Este proyecto implementa la función <strong>minimo()</strong> en Python, incluye <strong>pruebas con pytest</strong>
+          (caso correcto, límite y error) y un pipeline de <strong>GitHub Actions</strong> que corre automáticamente en cada push a main.
+        </p>
+
+        <div class="hero-cta">
+          <a class="btn primary" href="#uso">Empezar</a>
+          <a class="btn" href="#estructura">Ver estructura</a>
+        </div>
+
+        <div class="meta">
+          <div class="badge">🐍 Python 3.10 (CI)</div>
+          <div class="badge">🧪 pytest</div>
+          <div class="badge">⚙️ GitHub Actions</div>
+          <div class="badge">🛡️ Validación + Excepciones</div>
+        </div>
+      </div>
+
+      <aside class="card hero-right">
+        <div class="mini">
+          <h3>¿Qué hace?</h3>
+          <p>Devuelve el menor número de un iterable. Si hay errores (vacío, None o no-numéricos), lanza excepciones.</p>
+        </div>
+        <div class="mini">
+          <h3>¿Qué demuestra?</h3>
+          <p>Ciclo DevOps: pipeline verde ✅, falla provocada 🔴, corrección ✅.</p>
+        </div>
+        <div class="mini">
+          <h3>Ideal para entrega</h3>
+          <p>Incluye documentación, estructura, pruebas y automatización lista para capturas en GitHub Actions.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid">
+      <div id="uso" class="card section col-7">
+        <h2>Cómo usar la función</h2>
+        <p>Importa <code>minimo</code> desde <code>minimo.py</code> y pásale una lista (o iterable) de números.</p>
+
+        <div class="code" role="region" aria-label="Ejemplo de uso">
+<pre><span class="c"># app.py (ejemplo rápido)</span>
+<span class="k">from</span> minimo <span class="k">import</span> <span class="f">minimo</span>
+
+numeros = [5, 2, 9, 1]
+resultado = <span class="f">minimo</span>(numeros)
+
+<span class="k">print</span>(resultado)  <span class="c"># 1</span></pre>
+        </div>
+
+        <ul class="list">
+          <li class="item"><span class="dot"></span>Si la lista está vacía → <strong>ValueError</strong></li>
+          <li class="item"><span class="dot"></span>Si contiene un valor no numérico → <strong>TypeError</strong></li>
+          <li class="item"><span class="dot"></span>Si se pasa <code>None</code> → <strong>TypeError</strong></li>
+        </ul>
+      </div>
+
+      <div id="tests" class="card section col-5">
+        <h2>Pruebas (pytest)</h2>
+        <p>Ejecuta todas las pruebas desde la raíz del proyecto:</p>
+
+        <div class="code">
+<pre>python3 -m pytest -v</pre>
+        </div>
+
+        <p style="margin-top:12px;">Ejecutar pruebas individuales:</p>
+        <div class="code">
+<pre>python3 -m pytest -v tests/test_minimo.py::test_minimo_caso_correcto
+python3 -m pytest -v tests/test_minimo.py::test_minimo_caso_limite_un_solo_elemento
+python3 -m pytest -v tests/test_minimo.py::test_minimo_caso_error_lista_vacia</pre>
+        </div>
+      </div>
+
+      <div id="estructura" class="card section col-12">
+        <h2>Estructura del proyecto</h2>
+        <p>Organización mínima requerida para función + pruebas + CI.</p>
+        <div class="code">
+<pre>minimo-lista/
+├── minimo.py
+├── requirements.txt
+├── tests/
+│   └── test_minimo.py
+└── .github/
+    └── workflows/
+        └── ci.yml</pre>
+        </div>
+      </div>
+
+      <div id="ci" class="card section col-12">
+        <h2>CI con GitHub Actions</h2>
+        <p>
+          El pipeline corre automáticamente en cada <strong>push</strong> a <code>main</code> usando <strong>Python 3.10</strong>,
+          instala dependencias y ejecuta <strong>pytest</strong>.
+        </p>
+        <div class="code">
+<pre><span class="c"># .github/workflows/ci.yml (resumen)</span>
+name: CI
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -r requirements.txt
+      - run: pytest -q</pre>
+        </div>
+
+        <ul class="list">
+          <li class="item"><span class="dot"></span>✅ Pipeline verde: tests pasan</li>
+          <li class="item"><span class="dot"></span>🔴 Forzar fallo: cambia un esperado en un test</li>
+          <li class="item"><span class="dot"></span>✅ Reparar: vuelve a corregir el test y repite push</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>Hecho para <strong>DevOps + Testing</strong> · Proyecto “mínimo (lista)”</div>
+      <div class="tiny">Tip: publica este index con GitHub Pages si tu profe lo pide.</div>
+    </footer>
+  </div>
+</body>
+</html>
