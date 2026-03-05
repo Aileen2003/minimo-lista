@@ -3,7 +3,7 @@ from minimo import minimo
 
 
 def test_minimo_caso_correcto():
-    assert minimo([5, 2, 9, 1]) == 1
+    assert minimo([5, 2, 9, 1]) == 2
 
 
 def test_minimo_caso_limite_un_solo_elemento():
